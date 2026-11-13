@@ -122,11 +122,11 @@ function Membrane() {
   const halo = useMemo(() => makeGlowMaterial(PAL.pink, 0.35, 3.0), []);
   const camera = useThree((s) => s.camera);
   useFrame(() => {
-    mat.uniforms.uTime.value = live.time;
+    mat.uniforms['uTime']!.value = live.time;
     const d = camera.position.length();
     const far = THREE.MathUtils.smoothstep(d, 40, 260);
-    mat.uniforms.uFar.value = far;
-    halo.uniforms.uIntensity.value = 0.15 + far * 0.6;
+    mat.uniforms['uFar']!.value = far;
+    halo.uniforms['uIntensity']!.value = 0.15 + far * 0.6;
   });
   return (
     <>
@@ -160,7 +160,7 @@ function Nucleus() {
   }, [pores]);
   useFrame(() => {
     const b = 0.5 + 0.5 * Math.sin(live.time * 1.4);
-    glow.uniforms.uIntensity.value = 0.45 + b * 0.35;
+    glow.uniforms['uIntensity']!.value = 0.45 + b * 0.35;
     if (coreRef.current) coreRef.current.emissiveIntensity = 0.35 + b * 0.25;
   });
   return (
@@ -415,8 +415,8 @@ function Particles() {
   }, []);
   const dpr = useThree((s) => s.viewport.dpr);
   useFrame(() => {
-    mat.uniforms.uTime.value = live.time;
-    mat.uniforms.uPixelRatio.value = dpr;
+    mat.uniforms['uTime']!.value = live.time;
+    mat.uniforms['uPixelRatio']!.value = dpr;
   });
   return <points geometry={geo} material={mat} renderOrder={7} />;
 }
