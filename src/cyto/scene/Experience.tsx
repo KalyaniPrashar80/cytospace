@@ -39,8 +39,8 @@ function lensPose(id: HotspotId, aspect: number, out: Pose) {
 
 function cellPose(aspect: number, p: number, out: Pose) {
   const portrait = aspect < 0.8;
-  out.fov = portrait ? 64 : 50;
-  const z = introCameraZ(p, portrait ? 9.3 : 9.0);
+  out.fov = portrait ? 66 : 54;
+  const z = introCameraZ(p, portrait ? 9.5 : 9.3);
   const wob = Math.min(1, Math.max(0, (p - 0.6) / 0.4));
   out.pos.set(Math.sin(p * 4) * 0.6 * wob * (1 - p) * 4, 0.25 * wob, z);
   out.look.set(0, 0, 0);

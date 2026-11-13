@@ -39,19 +39,17 @@ function buildMicrotubules(rng: () => number) {
 function erPoint(s: { r0: number; a: number; b: number; phi: number; w: number; ph: number }, u: number, v: number, out: THREE.Vector3) {
   const th = s.a + (s.b - s.a) * u;
   const phi = s.phi + (v - 0.5) * s.w;
-  const r = s.r0 + 0.24 * Math.sin(u * 16 + s.ph) + 0.12 * Math.sin(v * 7 + u * 5 + s.ph);
+  const r = s.r0 + 0.2 * Math.sin(u * 22 + s.ph) + 0.08 * Math.sin(v * 9 + u * 7 + s.ph);
   return out.set(Math.sin(phi) * Math.cos(th) * r, Math.cos(phi) * r, Math.sin(phi) * Math.sin(th) * r);
 }
 
 function buildER(rng: () => number) {
-  const sheets = [
-    { r0: 2.75, a: -0.9, b: 2.5, phi: 1.45, w: 1.1, ph: 0.2 },
-    { r0: 3.15, a: -0.6, b: 2.2, phi: 1.75, w: 1.0, ph: 1.4 },
-    { r0: 3.55, a: -0.2, b: 2.7, phi: 1.3, w: 1.2, ph: 2.6 },
-    { r0: 3.95, a: 0.1, b: 2.3, phi: 1.6, w: 0.9, ph: 3.3 },
-    { r0: 4.35, a: 0.3, b: 1.9, phi: 1.2, w: 0.8, ph: 4.1 },
-    { r0: 3.0, a: 3.2, b: 4.6, phi: 0.9, w: 0.7, ph: 5.0 },
-  ];
+  const sheets: { r0: number; a: number; b: number; phi: number; w: number; ph: number }[] = [];
+  for (let i = 0; i < 11; i++) {
+    const a = -0.6 + rng() * 2.2;
+    sheets.push({ r0: 2.7 + (i % 5) * 0.38, a, b: a + 1.4 + rng() * 1.2, phi: 0.9 + rng() * 1.4, w: 0.16 + rng() * 0.14, ph: rng() * 6 });
+  }
+
   const v = new THREE.Vector3();
   const geos = sheets.map((s) => {
     const g = new THREE.PlaneGeometry(1, 1, 80, 12);
@@ -65,7 +63,7 @@ function buildER(rng: () => number) {
   });
   const ribo: THREE.Vector3[] = [];
   sheets.forEach((s) => {
-    for (let i = 0; i < 150; i++) {
+    for (let i = 0; i < 70; i++) {
       const p = erPoint(s, rng(), rng(), new THREE.Vector3());
       p.setLength(p.length() + (rng() > 0.5 ? 0.06 : -0.06));
       ribo.push(p);
@@ -75,7 +73,7 @@ function buildER(rng: () => number) {
     const p = randomInSphere(rng, NUCLEUS_R + 0.5, 8.6);
     ribo.push(p);
   }
-  const hotspot = erPoint(sheets[4]!, 0.5, 0.5, new THREE.Vector3());
+  const hotspot = erPoint(sheets[10]!, 0.5, 0.5, new THREE.Vector3());
   hotspot.setLength(hotspot.length() + 0.18);
   return { geo: mergeGeometries(geos), ribo, hotspot };
 }
@@ -141,7 +139,7 @@ function Membrane() {
 }
 
 function Nucleus() {
-  const glow = useMemo(() => makeGlowMaterial(PAL.lavender, 0.55, 2.2), []);
+  const glow = useMemo(() => makeGlowMaterial(PAL.lavender, 0.8, 1.6), []);
   const coreRef = useRef<THREE.MeshStandardMaterial>(null);
   const pores = useMemo(() => {
     const rng = mulberry32(7);
@@ -160,8 +158,8 @@ function Nucleus() {
   }, [pores]);
   useFrame(() => {
     const b = 0.5 + 0.5 * Math.sin(live.time * 1.4);
-    glow.uniforms['uIntensity']!.value = 0.45 + b * 0.35;
-    if (coreRef.current) coreRef.current.emissiveIntensity = 0.35 + b * 0.25;
+    glow.uniforms['uIntensity']!.value = 0.6 + b * 0.45;
+    if (coreRef.current) coreRef.current.emissiveIntensity = 0.55 + b * 0.35;
   });
   return (
     <group>
@@ -427,9 +425,9 @@ function MembraneReceptors({ hotspot }: { hotspot: THREE.Vector3 }) {
     const rng = mulberry32(17);
     const o = new THREE.Object3D();
     const up = new THREE.Vector3(0, 1, 0);
-    for (let i = 0; i < 48; i++) {
+    for (let i = 0; i < 34; i++) {
       const d = i === 0 ? hotspot.clone().normalize() : randomInSphere(rng, 1, 1).normalize();
-      o.position.copy(d).multiplyScalar(MEMBRANE_RADIUS - 0.05);
+      o.position.copy(d).multiplyScalar(MEMBRANE_RADIUS - 0.12);
       o.quaternion.setFromUnitVectors(up, d);
       o.scale.setScalar(i === 0 ? 1.4 : 0.8 + rng() * 0.4);
       o.updateMatrix();
@@ -438,8 +436,8 @@ function MembraneReceptors({ hotspot }: { hotspot: THREE.Vector3 }) {
     if (ref.current) ref.current.instanceMatrix.needsUpdate = true;
   }, [hotspot]);
   return (
-    <instancedMesh ref={ref} args={[undefined, undefined, 48]}>
-      <capsuleGeometry args={[0.09, 0.45, 4, 8]} />
+    <instancedMesh ref={ref} args={[undefined, undefined, 34]}>
+      <capsuleGeometry args={[0.08, 0.28, 4, 8]} />
       <meshStandardMaterial color={PAL.lavenderDeep} emissive={PAL.lavender} emissiveIntensity={0.4} />
     </instancedMesh>
   );
@@ -486,9 +484,9 @@ export function Cell() {
       <group ref={root} rotation={[0.15, -0.5, 0]}>
         <Nucleus />
         <mesh geometry={built.er.geo}>
-          <meshPhysicalMaterial color={PAL.pinkSoft} side={THREE.DoubleSide} roughness={0.35} clearcoat={0.7} emissive={PAL.pink} emissiveIntensity={0.08} />
+          <meshPhysicalMaterial color={PAL.pinkSoft} side={THREE.DoubleSide} roughness={0.35} clearcoat={0.7} emissive={PAL.pink} emissiveIntensity={0.1} transparent opacity={0.82} depthWrite={false} />
         </mesh>
-        <InstancedPoints points={built.er.ribo} radius={0.05} color={PAL.pink} emissive={0.25} />
+        <InstancedPoints points={built.er.ribo} radius={0.045} color={PAL.pink} emissive={0.25} />
         <Golgi />
         <Mitochondria {...built.mitos} />
         <Microtubules {...built.mts} />

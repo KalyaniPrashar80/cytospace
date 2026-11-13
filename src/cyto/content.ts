@@ -89,7 +89,7 @@ export function nextHotspot(id: HotspotId, dir: 1 | -1): HotspotId {
 
 // --- Intro camera: a tiny dot far away -> through the membrane -> inside ---
 export const MEMBRANE_RADIUS = 10;
-export const INTRO_START_Z = 1500;
+export const INTRO_START_Z = 620;
 const OUTSIDE_Z = 15;
 
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
