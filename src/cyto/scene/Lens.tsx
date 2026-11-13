@@ -19,12 +19,28 @@ export const LENS_FRAMES: Record<HotspotId, { w: number; h: number; cy: number }
 };
 
 function Tag({ position, children }: { position: [number, number, number]; children: ReactNode }) {
+  const group = useRef<THREE.Group>(null);
+  const span = useRef<HTMLSpanElement>(null);
+  useFrame(() => {
+    let o: THREE.Object3D | null = group.current;
+    let vis = true;
+    while (o) {
+      if (!o.visible) {
+        vis = false;
+        break;
+      }
+      o = o.parent;
+    }
+    if (span.current) span.current.style.display = vis && !live.transitioning ? "inline-block" : "none";
+  });
   return (
-    <Html position={position} center zIndexRange={[5, 0]} style={{ pointerEvents: "none" }}>
-      <span className="glass whitespace-nowrap rounded-full px-2.5 py-0.5 text-[11px] font-medium text-foreground">
-        {children}
-      </span>
-    </Html>
+    <group ref={group} position={position}>
+      <Html center zIndexRange={[5, 0]} style={{ pointerEvents: "none" }}>
+        <span ref={span} className="glass hidden whitespace-nowrap rounded-full px-2.5 py-0.5 text-[11px] font-medium text-foreground">
+          {children}
+        </span>
+      </Html>
+    </group>
   );
 }
 
