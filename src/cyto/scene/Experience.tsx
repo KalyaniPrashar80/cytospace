@@ -9,6 +9,7 @@ import { Cell } from "./Cell";
 import { LENS_FRAMES, LENS_ORIGIN, Lens } from "./Lens";
 import { damp, smooth } from "./helpers";
 import { cn } from "@/lib/utils";
+import { HotspotMarkers, LensTags } from "../ui/Labels";
 
 const OUT_SECONDS = 0.8;
 const IN_SECONDS = 0.9;
@@ -179,6 +180,36 @@ function Stepper() {
       live.flashEl.style.opacity = (fl * 0.9).toFixed(3);
     }
 
+    // --- pin DOM labels to their 3D anchors ---
+    cam.updateMatrixWorld();
+    const pv = tmp.current;
+    const camDist = cam.position.length();
+    for (const id in live.labelEls) {
+      const el = live.labelEls[id];
+      const a = live.anchors[id];
+      if (!el) continue;
+      let vis = !!a;
+      for (let o: THREE.Object3D | null = a ?? null; o; o = o.parent) {
+        if (!o.visible) {
+          vis = false;
+          break;
+        }
+      }
+      if (vis && a) {
+        a.getWorldPosition(pv);
+        const behind = pv.distanceTo(cam.position) > camDist + 1.5;
+        pv.project(cam);
+        if (pv.z > 1 || (id.startsWith("tag:") && live.transitioning)) vis = false;
+        if (vis) {
+          const x = (pv.x * 0.5 + 0.5) * size.width;
+          const y = (-pv.y * 0.5 + 0.5) * size.height;
+          el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) translate(-50%, -50%) scale(${id.startsWith("spot:") && behind && live.displayed === null ? 0.82 : 1})`;
+          el.style.opacity = id.startsWith("spot:") && behind && live.displayed === null ? "0.45" : "1";
+        }
+      }
+      el.style.visibility = vis ? "visible" : "hidden";
+    }
+
     if (readyFrames.current < 3 && ++readyFrames.current === 3 && live.wrapperEl) {
       live.wrapperEl.dataset['sceneReady'] = "true";
     }
@@ -267,6 +298,10 @@ export default function Experience() {
         <Cell />
         <Lens />
       </Canvas>
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <LensTags />
+        <HotspotMarkers />
+      </div>
     </div>
   );
 }

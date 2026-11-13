@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import { Html } from "@react-three/drei";
 import * as THREE from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
-import { HOTSPOTS, MEMBRANE_RADIUS, type HotspotId } from "../content";
+import { MEMBRANE_RADIUS, type HotspotId } from "../content";
 import { PAL } from "../palette";
 import { mulberry32 } from "../rng";
-import { live, useCyto } from "../store";
+import { live } from "../store";
+import { Anchor } from "./Anchor";
 import { makeGlowMaterial, makeMembraneMaterial, makeParticleMaterial } from "./shaders";
 import { randomInSphere } from "./helpers";
 
@@ -445,52 +445,6 @@ function MembraneReceptors({ hotspot }: { hotspot: THREE.Vector3 }) {
   );
 }
 
-function Marker({ id, position }: { id: HotspotId; position: THREE.Vector3 }) {
-  const show = useCyto((s) => s.phase === "explore" && s.view === "reality" && s.focus === null);
-  const setFocus = useCyto((s) => s.setFocus);
-  const stopTour = useCyto((s) => s.stopTour);
-  const ref = useRef<HTMLButtonElement>(null);
-  const world = useMemo(() => new THREE.Vector3(), []);
-  const camera = useThree((s) => s.camera);
-  const groupRef = useRef<THREE.Group>(null);
-  useFrame(() => {
-    if (!ref.current || !groupRef.current) return;
-    groupRef.current.getWorldPosition(world);
-    const dCam = world.distanceTo(camera.position);
-    const dCenter = camera.position.length();
-    const behind = dCam > dCenter + 1.5;
-    ref.current.style.opacity = behind ? "0.4" : "1";
-    ref.current.style.transform = `scale(${behind ? 0.82 : 1})`;
-  });
-  return (
-    <group ref={groupRef} position={position}>
-      <Html center zIndexRange={[30, 10]} style={{ pointerEvents: show ? "auto" : "none" }}>
-        <div className={show ? "opacity-100 transition-opacity duration-700" : "opacity-0 transition-opacity duration-300"}>
-          <button
-            ref={ref}
-            type="button"
-            aria-label={`Zoom into ${HOTSPOTS[id].title}`}
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={() => {
-              stopTour();
-              setFocus(id);
-            }}
-            className="group flex cursor-pointer items-center gap-2 whitespace-nowrap transition-transform duration-300"
-          >
-            <span className="relative grid size-8 place-items-center">
-              <span className="absolute inset-0 rounded-full bg-primary/40 animate-hotspot-ping" />
-              <span className="size-3.5 rounded-full bg-primary shadow-glow ring-4 ring-card/80 transition-transform group-hover:scale-125" />
-            </span>
-            <span className="glass rounded-full px-3 py-1 text-xs font-medium text-foreground">
-              {HOTSPOTS[id].title}
-            </span>
-          </button>
-        </div>
-      </Html>
-    </group>
-  );
-}
-
 export function Cell() {
   const built = useMemo(() => {
     const rng = mulberry32(2026);
@@ -543,7 +497,7 @@ export function Cell() {
         <Particles />
         <Membrane />
         {(Object.keys(built.spots) as HotspotId[]).map((id) => (
-          <Marker key={id} id={id} position={built.spots[id]} />
+          <Anchor key={id} id={`spot:${id}`} position={built.spots[id]} />
         ))}
       </group>
     </group>
