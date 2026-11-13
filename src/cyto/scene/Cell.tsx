@@ -55,7 +55,7 @@ function buildER(rng: () => number) {
   const v = new THREE.Vector3();
   const geos = sheets.map((s) => {
     const g = new THREE.PlaneGeometry(1, 1, 80, 12);
-    const pos = g.attributes.position;
+    const pos = g.attributes['position']!;
     for (let i = 0; i < pos.count; i++) {
       erPoint(s, pos.getX(i) + 0.5, pos.getY(i) + 0.5, v);
       pos.setXYZ(i, v.x, v.y, v.z);
@@ -75,14 +75,14 @@ function buildER(rng: () => number) {
     const p = randomInSphere(rng, NUCLEUS_R + 0.5, 8.6);
     ribo.push(p);
   }
-  const hotspot = erPoint(sheets[4], 0.5, 0.5, new THREE.Vector3());
+  const hotspot = erPoint(sheets[4]!, 0.5, 0.5, new THREE.Vector3());
   hotspot.setLength(hotspot.length() + 0.18);
   return { geo: mergeGeometries(geos), ribo, hotspot };
 }
 
 function bentPancake(len: number, width: number, thick: number, bend: number) {
   const g = new THREE.SphereGeometry(1, 40, 14);
-  const p = g.attributes.position;
+  const p = g.attributes['position']!;
   for (let i = 0; i < p.count; i++) {
     const x = p.getX(i) * len;
     const y = p.getY(i) * width;
@@ -253,7 +253,9 @@ function Golgi() {
         </mesh>
       ))}
       {vesicles.map((v, i) => (
-        <mesh key={i} ref={(el) => (vRefs.current[i] = el)} position={v.base}>
+        <mesh key={i} ref={(el) => {
+            vRefs.current[i] = el;
+          }} position={v.base}>
           <sphereGeometry args={[v.r, 14, 10]} />
           <meshPhysicalMaterial color={v.pink ? PAL.pinkSoft : PAL.mint} roughness={0.2} clearcoat={1} />
         </mesh>
@@ -277,7 +279,9 @@ function Mitochondria({ list, cristae }: ReturnType<typeof buildMitochondria>) {
     <>
       {list.map((m, i) => (
         <group key={i} position={m.pos} quaternion={m.quat} scale={m.scale}>
-          <group ref={(el) => (refs.current[i] = el)}>
+          <group ref={(el) => {
+            refs.current[i] = el;
+          }}>
             <mesh geometry={cristae}>
               <meshStandardMaterial color={PAL.mintDeep} roughness={0.5} />
             </mesh>
@@ -307,7 +311,7 @@ function Microtubules({ curves, geo }: ReturnType<typeof buildMicrotubules>) {
       const m = refs.current[i];
       if (!m) return;
       const u = (live.time * c.sp + c.off) % 1;
-      c.c.getPointAt(0.08 + u * 0.88, p);
+      c.c!.getPointAt(0.08 + u * 0.88, p);
       m.position.copy(p);
       m.scale.setScalar(Math.sin(Math.PI * u) * 0.9 + 0.1);
     });
@@ -328,7 +332,9 @@ function Microtubules({ curves, geo }: ReturnType<typeof buildMicrotubules>) {
         </mesh>
       </group>
       {cargo.map((_, i) => (
-        <mesh key={i} ref={(el) => (refs.current[i] = el)}>
+        <mesh key={i} ref={(el) => {
+            refs.current[i] = el;
+          }}>
           <sphereGeometry args={[0.16, 16, 12]} />
           <meshPhysicalMaterial color={PAL.pinkSoft} roughness={0.15} clearcoat={1} transparent opacity={0.85} />
         </mesh>
@@ -347,7 +353,7 @@ function Proteins() {
       s: 0.05 + rng() * 0.09,
       w: 0.03 + rng() * 0.05,
       ph: rng() * 20,
-      col: new THREE.Color(cols[Math.floor(rng() * cols.length)]),
+      col: new THREE.Color(cols[Math.floor(rng() * cols.length)]!),
     }));
   }, []);
   const ref = useRef<THREE.InstancedMesh>(null);
@@ -361,7 +367,7 @@ function Proteins() {
     if (!mesh) return;
     const t = live.time;
     for (let i = 0; i < COUNT; i++) {
-      const d = data[i];
+      const d = data[i]!;
       const a = t * d.w;
       const c = Math.cos(a), s = Math.sin(a);
       o.position.set(
@@ -397,7 +403,7 @@ function Particles() {
       randomInSphere(rng, NUCLEUS_R + 0.3, 9.4, v);
       pos.set([v.x, v.y, v.z], i * 3);
       seed.set([rng(), rng(), rng(), rng()], i * 4);
-      const c = cols[Math.floor(rng() * cols.length)];
+      const c = cols[Math.floor(rng() * cols.length)]!;
       col.set([c.r, c.g, c.b], i * 3);
     }
     const g = new THREE.BufferGeometry();
@@ -492,8 +498,8 @@ export function Cell() {
     const er = buildER(rng);
     const mitos = buildMitochondria(rng);
     const receptor = new THREE.Vector3(-0.45, 0.35, -0.82).normalize().multiplyScalar(MEMBRANE_RADIUS - 0.15);
-    const kinesin = mts.curves[0].getPointAt(0.55);
-    const atp = mitos.list[0].pos.clone().add(new THREE.Vector3(0, 0, 0.55));
+    const kinesin = mts.curves[0]!.getPointAt(0.55);
+    const atp = mitos.list[0]!.pos.clone().add(new THREE.Vector3(0, 0, 0.55));
     return { mts, er, mitos, spots: { kinesin, ribosome: er.hotspot, atp, receptor } as Record<HotspotId, THREE.Vector3> };
   }, []);
 

@@ -180,7 +180,7 @@ function Stepper() {
     }
 
     if (readyFrames.current < 3 && ++readyFrames.current === 3 && live.wrapperEl) {
-      live.wrapperEl.dataset.sceneReady = "true";
+      live.wrapperEl.dataset['sceneReady'] = "true";
     }
   });
   return null;

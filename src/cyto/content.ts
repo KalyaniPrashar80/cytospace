@@ -84,7 +84,7 @@ export function clampSpeed(v: number): number {
 
 export function nextHotspot(id: HotspotId, dir: 1 | -1): HotspotId {
   const i = TOUR_ORDER.indexOf(id);
-  return TOUR_ORDER[(i + dir + TOUR_ORDER.length) % TOUR_ORDER.length];
+  return TOUR_ORDER[(i + dir + TOUR_ORDER.length) % TOUR_ORDER.length]!;
 }
 
 // --- Intro camera: a tiny dot far away -> through the membrane -> inside ---

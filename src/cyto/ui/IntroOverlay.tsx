@@ -66,7 +66,9 @@ export function IntroOverlay() {
       {CAPTIONS.map((c, i) => (
         <div
           key={i}
-          ref={(el) => (caps.current[i] = el)}
+          ref={(el) => {
+            caps.current[i] = el;
+          }}
           className="absolute inset-x-0 top-[20vh] px-6 text-center opacity-0"
         >
           <p className="font-display text-4xl font-medium italic text-foreground sm:text-6xl">{c.text}</p>

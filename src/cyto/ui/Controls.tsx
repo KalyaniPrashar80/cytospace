@@ -29,7 +29,7 @@ export function Controls() {
             max={SPEED_MAX}
             step={0.05}
             value={[speed]}
-            onValueChange={(v) => setSpeed(v[0])}
+            onValueChange={(v) => setSpeed(v[0] ?? 1)}
           />
           <Rabbit className="size-4 shrink-0 text-muted-foreground" aria-hidden />
           <span className="w-10 shrink-0 text-right text-sm font-semibold tabular-nums text-foreground">

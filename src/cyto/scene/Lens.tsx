@@ -222,7 +222,7 @@ function Ribosome() {
       o.scale.setScalar(0.001 + fade);
       o.updateMatrix();
       rna.current.setMatrixAt(i, o.matrix);
-      rna.current.setColorAt(i, baseCols[seq[(i + k * 7) % N_BEADS]]);
+      rna.current.setColorAt(i, baseCols[seq[(i + k * 7) % N_BEADS]!]!);
     }
     rna.current.instanceMatrix.needsUpdate = true;
     if (rna.current.instanceColor) rna.current.instanceColor.needsUpdate = true;
@@ -244,7 +244,7 @@ function Ribosome() {
       }
       o.updateMatrix();
       chain.current.setMatrixAt(k, o.matrix);
-      chain.current.setColorAt(k, aaCols[(read - k + 1000) % aaCols.length]);
+      chain.current.setColorAt(k, aaCols[(read - k + 1000) % aaCols.length]!);
     }
     chain.current.instanceMatrix.needsUpdate = true;
     if (chain.current.instanceColor) chain.current.instanceColor.needsUpdate = true;
@@ -423,13 +423,17 @@ function AtpSynthase() {
       </group>
       <mesh geometry={stator}>{glossy(PAL.mauveSoft)}</mesh>
       {pData.map((_, i) => (
-        <mesh key={i} ref={(el) => (protons.current[i] = el)}>
+        <mesh key={i} ref={(el) => {
+            protons.current[i] = el;
+          }}>
           <sphereGeometry args={[0.06, 10, 8]} />
           <meshStandardMaterial color={PAL.white} emissive={PAL.pink} emissiveIntensity={1.1} />
         </mesh>
       ))}
       {[0, 1, 2].map((i) => (
-        <mesh key={i} ref={(el) => (atps.current[i] = el)}>
+        <mesh key={i} ref={(el) => {
+            atps.current[i] = el;
+          }}>
           <icosahedronGeometry args={[0.13, 1]} />
           <meshStandardMaterial color={PAL.white} emissive={PAL.peach} emissiveIntensity={1} />
         </mesh>
@@ -496,7 +500,9 @@ function Receptor() {
         return (
           <mesh key={i} position={[Math.cos(a) * 0.3, 0.05, Math.sin(a) * 0.3]} rotation={[Math.sin(a) * 0.15, 0, Math.cos(a) * 0.15]}>
             <capsuleGeometry args={[0.11, 0.95, 4, 12]} />
-            <meshPhysicalMaterial ref={(el) => (helixMats.current[i] = el)} color={PAL.lavender} emissive={PAL.pink} emissiveIntensity={0.1} roughness={0.3} clearcoat={1} />
+            <meshPhysicalMaterial ref={(el) => {
+            helixMats.current[i] = el;
+          }} color={PAL.lavender} emissive={PAL.pink} emissiveIntensity={0.1} roughness={0.3} clearcoat={1} />
           </mesh>
         );
       })}
@@ -511,7 +517,9 @@ function Receptor() {
         </mesh>
       ))}
       {[0, 1, 2, 3].map((i) => (
-        <mesh key={i} ref={(el) => (pulses.current[i] = el)}>
+        <mesh key={i} ref={(el) => {
+            pulses.current[i] = el;
+          }}>
           <sphereGeometry args={[0.11, 16, 12]} />
           <meshStandardMaterial color={PAL.white} emissive={PAL.pink} emissiveIntensity={1.4} />
         </mesh>

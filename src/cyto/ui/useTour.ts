@@ -19,7 +19,7 @@ export function useTour() {
         return;
       }
       st.setTourStep(i);
-      st.setFocus(TOUR_ORDER[i]);
+      st.setFocus(TOUR_ORDER[i]!);
       i++;
       timer = setTimeout(step, TOUR_STOP_SECONDS * 1000);
     };
