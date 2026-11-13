@@ -234,3 +234,8 @@
 .tb-on .tb-label {
   opacity: 1;
 }
+
+@keyframes tour-fill {
+  from { width: 0%; }
+  to { width: 100%; }
+}
