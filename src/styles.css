@@ -1,9 +1,6 @@
 /*
  * Tailwind v4 entry: config lives here, with no tailwind.config.js or PostCSS plugin.
- * - Keep every @import in this top block, above @theme and the rest of the file. Install an
- *   npm package before @importing its CSS. Never @import a remote URL (web fonts, CDN CSS): the
- *   build resolves @import from the filesystem. Load those with a <link> in the head() of
- *   src/routes/__root.tsx and name the family in a --font-* token in @theme inline below.
+ * Keep every @import in this top block. Web fonts load via <link> in src/routes/__root.tsx.
  */
 @import "tailwindcss" source(none);
 @source "../src";
@@ -11,25 +8,12 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/*
- * Design system definition.
- *
- * The design lives in this file: oklch color tokens on the shadcn variables
- * (--background, --foreground, --primary, --secondary, --muted, --accent, ...) plus
- * new tokens as needed, font tokens, and custom styles and animations.
- *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
- *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
- *
- * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
- */
+/* CYTO SPACE design system: pastel lab. ink / pink / mauve / blush + lavender & mint. */
 
 @theme inline {
+  --font-display: "EB Garamond", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -57,6 +41,19 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
+
+  --color-ink: var(--ink);
+  --color-pink: var(--pink);
+  --color-mauve: var(--mauve);
+  --color-blush: var(--blush);
+  --color-blush-deep: var(--blush-deep);
+  --color-lavender: var(--lavender);
+  --color-lavender-soft: var(--lavender-soft);
+  --color-mint: var(--mint);
+  --color-mint-soft: var(--mint-soft);
+  --color-paper: var(--paper);
+  --color-paper-line: var(--paper-line);
+
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -73,83 +70,172 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
+  --radius: 1.25rem;
+
+  --ink: oklch(0.274 0.052 349.8);
+  --pink: oklch(0.636 0.203 5.2);
+  --mauve: oklch(0.564 0.045 356.8);
+  --blush: oklch(0.941 0.028 355.4);
+  --blush-deep: oklch(0.892 0.048 355.1);
+  --lavender: oklch(0.816 0.08 298.5);
+  --lavender-soft: oklch(0.939 0.028 301.8);
+  --mint: oklch(0.877 0.071 169.7);
+  --mint-soft: oklch(0.959 0.024 169.9);
+  --paper: oklch(0.992 0.006 85);
+  --paper-line: oklch(0.86 0.04 240 / 55%);
+
+  --background: var(--blush);
+  --foreground: var(--ink);
+  --card: oklch(0.99 0.008 355);
+  --card-foreground: var(--ink);
+  --popover: oklch(0.99 0.008 355);
+  --popover-foreground: var(--ink);
+  --primary: var(--pink);
+  --primary-foreground: oklch(0.99 0.006 355);
+  --secondary: var(--lavender-soft);
+  --secondary-foreground: var(--ink);
+  --muted: oklch(0.92 0.03 355);
+  --muted-foreground: var(--mauve);
+  --accent: var(--mint-soft);
+  --accent-foreground: var(--ink);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.984 0.003 247.858);
-  --sidebar-foreground: oklch(0.129 0.042 264.695);
-  --sidebar-primary: oklch(0.208 0.042 265.755);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.968 0.007 247.896);
-  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
-  --sidebar-border: oklch(0.929 0.013 255.508);
-  --sidebar-ring: oklch(0.704 0.04 256.788);
-}
+  --border: oklch(0.564 0.045 356.8 / 18%);
+  --input: oklch(0.564 0.045 356.8 / 25%);
+  --ring: var(--pink);
 
-.dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.208 0.042 265.755);
-  --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
+  --gradient-blush: radial-gradient(120% 90% at 50% 40%, oklch(0.975 0.015 355) 0%, var(--blush) 55%, var(--blush-deep) 100%);
+  --gradient-iris: radial-gradient(circle at 50% 50%, oklch(0.995 0.006 355) 0%, var(--blush) 45%, var(--lavender-soft) 100%);
+  --gradient-membrane: radial-gradient(circle at 50% 50%, oklch(0.636 0.203 5.2 / 0%) 20%, oklch(0.636 0.203 5.2 / 35%) 75%, oklch(0.636 0.203 5.2 / 55%) 100%);
+  --shadow-soft: 0 18px 50px -18px oklch(0.274 0.052 349.8 / 28%), 0 2px 8px -2px oklch(0.274 0.052 349.8 / 10%);
+  --shadow-glow: 0 0 0 1px oklch(0.636 0.203 5.2 / 25%), 0 10px 30px -8px oklch(0.636 0.203 5.2 / 55%);
+  --shadow-paper: 0 30px 60px -25px oklch(0.274 0.052 349.8 / 35%), 0 4px 12px -4px oklch(0.274 0.052 349.8 / 15%);
+
+  --chart-1: var(--pink);
+  --chart-2: var(--mint);
+  --chart-3: var(--lavender);
+  --chart-4: var(--mauve);
+  --chart-5: var(--ink);
+  --sidebar: var(--blush);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: var(--pink);
+  --sidebar-primary-foreground: oklch(0.99 0.006 355);
+  --sidebar-accent: var(--lavender-soft);
+  --sidebar-accent-foreground: var(--ink);
+  --sidebar-border: oklch(0.564 0.045 356.8 / 18%);
+  --sidebar-ring: var(--pink);
 }
 
 @layer base {
   * {
     border-color: var(--color-border);
   }
-
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
   }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+  }
+}
+
+/* Glassy rounded surface */
+@utility glass {
+  background: color-mix(in oklab, var(--card) 62%, transparent);
+  backdrop-filter: blur(18px) saturate(1.5);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  border: 1px solid color-mix(in oklab, var(--card) 85%, transparent);
+  box-shadow: var(--shadow-soft);
+}
+
+@utility glass-strong {
+  background: color-mix(in oklab, var(--card) 82%, transparent);
+  backdrop-filter: blur(22px) saturate(1.6);
+  -webkit-backdrop-filter: blur(22px) saturate(1.6);
+  border: 1px solid color-mix(in oklab, var(--card) 90%, transparent);
+  box-shadow: var(--shadow-soft);
+}
+
+@utility shadow-glow {
+  box-shadow: var(--shadow-glow);
+}
+
+@utility shadow-paper {
+  box-shadow: var(--shadow-paper);
+}
+
+@utility bg-iris {
+  background: var(--gradient-iris);
+}
+
+@utility bg-membrane-flash {
+  background: var(--gradient-membrane);
+}
+
+@utility bg-hero {
+  background: var(--gradient-blush);
+}
+
+/* Lined worksheet paper */
+@utility paper-lined {
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(90deg, transparent 2.4rem, oklch(0.636 0.203 5.2 / 35%) 2.4rem, oklch(0.636 0.203 5.2 / 35%) calc(2.4rem + 1px), transparent calc(2.4rem + 1px)),
+    repeating-linear-gradient(180deg, transparent 0, transparent 27px, var(--paper-line) 27px, var(--paper-line) 28px);
+}
+
+@utility text-balance-nice {
+  text-wrap: balance;
+}
+
+@keyframes hotspot-ping {
+  0% { transform: scale(0.6); opacity: 0.7; }
+  80%, 100% { transform: scale(2.4); opacity: 0; }
+}
+@keyframes float-soft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+@keyframes draw-in {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@utility animate-hotspot-ping {
+  animation: hotspot-ping 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@utility animate-float-soft {
+  animation: float-soft 2.6s ease-in-out infinite;
+}
+@utility animate-rise-in {
+  animation: rise-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* Textbook drawing: strokes draw in when the sheet is shown */
+.tb-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.tb-on .tb-draw {
+  animation: draw-in 1.1s cubic-bezier(0.6, 0, 0.3, 1) forwards;
+}
+.tb-label {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.tb-on .tb-label {
+  opacity: 1;
+}
+
+@keyframes tour-fill {
+  from { width: 0%; }
+  to { width: 100%; }
 }
