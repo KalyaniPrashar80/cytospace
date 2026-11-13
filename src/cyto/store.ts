@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Group } from "three";
+import type { Camera, Group, Object3D } from "three";
 import { SPEED_DEFAULT, clampSpeed, type HotspotId } from "./content";
 
 export type View = "reality" | "textbook";
@@ -56,6 +56,10 @@ export const live = {
   irisEl: null as HTMLDivElement | null,
   flashEl: null as HTMLDivElement | null,
   wrapperEl: null as HTMLDivElement | null,
+  /** 3D anchor objects and the DOM labels pinned to them (projected each frame). */
+  anchors: {} as Record<string, Object3D>,
+  labelEls: {} as Record<string, HTMLElement | null>,
+  camera: null as Camera | null,
 };
 
 export function skipIntro() {

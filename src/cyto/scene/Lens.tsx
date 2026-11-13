@@ -1,12 +1,13 @@
-import { useEffect, useMemo, useRef, type ReactNode } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Html } from "@react-three/drei";
 import * as THREE from "three";
 import type { HotspotId } from "../content";
 import { PAL } from "../palette";
 import { mulberry32 } from "../rng";
 import { live } from "../store";
 import { makeBackdropMaterial } from "./shaders";
+import { Anchor } from "./Anchor";
+import { LENS_TAGS } from "../labels";
 import { frac, smooth, spanBetween } from "./helpers";
 
 export const LENS_ORIGIN = new THREE.Vector3(0, 600, 0);
@@ -18,29 +19,13 @@ export const LENS_FRAMES: Record<HotspotId, { w: number; h: number; cy: number }
   receptor: { w: 4.0, h: 5.6, cy: -0.5 },
 };
 
-function Tag({ position, children }: { position: [number, number, number]; children: ReactNode }) {
-  const group = useRef<THREE.Group>(null);
-  const span = useRef<HTMLSpanElement>(null);
-  useFrame(() => {
-    let o: THREE.Object3D | null = group.current;
-    let vis = true;
-    while (o) {
-      if (!o.visible) {
-        vis = false;
-        break;
-      }
-      o = o.parent;
-    }
-    if (span.current) span.current.style.display = vis && !live.transitioning ? "inline-block" : "none";
-  });
+function Tags({ spot }: { spot: HotspotId }) {
   return (
-    <group ref={group} position={position}>
-      <Html center zIndexRange={[5, 0]} style={{ pointerEvents: "none" }}>
-        <span ref={span} className="glass hidden whitespace-nowrap rounded-full px-2.5 py-0.5 text-[11px] font-medium text-foreground">
-          {children}
-        </span>
-      </Html>
-    </group>
+    <>
+      {LENS_TAGS.filter((t) => t.spot === spot).map((t) => (
+        <Anchor key={t.id} id={t.id} position={t.pos} />
+      ))}
+    </>
   );
 }
 
@@ -182,9 +167,7 @@ function Kinesin() {
         <sphereGeometry args={[0.09, 16, 12]} />
         <meshStandardMaterial color={PAL.white} emissive={PAL.pink} emissiveIntensity={1.2} />
       </mesh>
-      <Tag position={[0, -0.6, 0]}>← 8 nm per step →</Tag>
-      <Tag position={[-1.2, 2.9, 0]}>cargo</Tag>
-      <Tag position={[1.9, 1.85, 0]}>ATP</Tag>
+      <Tags spot="kinesin" />
     </group>
   );
 }
@@ -289,9 +272,7 @@ function Ribosome() {
           {glossy(PAL.peach)}
         </mesh>
       </group>
-      <Tag position={[-2.0, -1.05, 0]}>mRNA</Tag>
-      <Tag position={[1.6, 2.6, 0]}>protein chain</Tag>
-      <Tag position={[-1.9, 2.2, 0]}>tRNA</Tag>
+      <Tags spot="ribosome" />
     </group>
   );
 }
@@ -438,9 +419,7 @@ function AtpSynthase() {
           <meshStandardMaterial color={PAL.white} emissive={PAL.peach} emissiveIntensity={1} />
         </mesh>
       ))}
-      <Tag position={[-1.5, 0, 1.6]}>spinning rotor</Tag>
-      <Tag position={[0, 2.6, 0]}>ATP out</Tag>
-      <Tag position={[-1.7, -1.4, 0]}>protons in</Tag>
+      <Tags spot="atp" />
     </group>
   );
 }
@@ -528,10 +507,7 @@ function Receptor() {
         <sphereGeometry args={[2.5, 48, 32]} />
         <meshPhysicalMaterial ref={nucleusMat} color={PAL.lavender} emissive={PAL.lavender} emissiveIntensity={0.25} roughness={0.3} clearcoat={1} />
       </mesh>
-      <Tag position={[-1.5, 2.95, 0]}>signal</Tag>
-      <Tag position={[1.55, 0.95, 0]}>receptor</Tag>
-      <Tag position={[-1.3, -0.75, 1.0]}>outside ↑ · inside ↓</Tag>
-      <Tag position={[1.5, -2.6, 0]}>to the nucleus</Tag>
+      <Tags spot="receptor" />
     </group>
   );
 }
